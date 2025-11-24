@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import pandas as pd
 from typing import Optional
 
+
 # ← ESTO ES IMPORTANTE: debe llamarse "app"
 app = FastAPI(title="KinetsuList API")
 
