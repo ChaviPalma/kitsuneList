@@ -1,237 +1,207 @@
-const sections = [
-    {
-        id: 'mi-lista',
-        name: 'Mi Lista',
-        icon: '❤️',
-        color: 'from-red-600 to-pink-600',
-        description: 'Tus animes guardados',
-        badge: '12 series',
-        endpoint: '/api/mi-lista'
-    },
-    {
-        id: 'proyectar',
-        name: 'Proyectar Éxito',
-        icon: '🔥',
-        color: 'from-orange-500 to-yellow-500',
-        description: 'Lo que será tendencia',
-        badge: 'HOT',
-        endpoint: '/api/proyectar-exito'
-    },
-    {
-        id: 'pronostico',
-        name: 'Pronóstico Rating',
-        icon: '⭐',
-        color: 'from-yellow-400 to-amber-500',
-        description: 'Ratings esperados',
-        badge: '⭐ 8.5+',
-        endpoint: '/api/pronostico-rating'
-    },
-    {
-        id: 'mapa',
-        name: 'Mapa de Nichos',
-        icon: '🗺️',
-        color: 'from-teal-500 to-emerald-600',
-        description: 'Explora géneros',
-        badge: '24 nichos',
-        endpoint: '/api/mapa-nichos'
-    },
-    {
-        id: 'adn',
-        name: 'ADN de Contenido',
-        icon: '🧬',
-        color: 'from-purple-600 to-indigo-600',
-        description: 'Análisis profundo',
-        badge: 'IA',
-        endpoint: '/api/animes?limit=10'
-    },
-    {
-        id: 'joyas',
-        name: 'Joyas Ocultas',
-        icon: '💎',
-        color: 'from-blue-600 to-cyan-500',
-        description: 'Descubre tesoros',
-        badge: '💎 Nuevo',
-        endpoint: '/api/joyas-ocultas'
-    }
+// Netflix-style rows implementation
+const galleries = [
+    { id : 'mi-lista', title: 'Mi Lista', endpoint: '/api/mi-lista' },
+    { id: 'recomendaciones', title: 'Nuestras Recomendaciones', endpoint: '/api/recomendaciones' },
+    { id: 'joyas', title: 'Joyas de todos los tiempos', endpoint: '/api/joyas-ocultas' },
 ];
 
-function generateCards() {
-    const container = document.getElementById('cards-container');
-    
-    sections.forEach(section => {
-        const card = document.createElement('button');
-        card.className = 'card relative group overflow-hidden rounded-xl bg-slate-900 border-2 border-slate-800 smooth-transition hover:scale-105 hover:-translate-y-1 hover:border-slate-700';
-        card.setAttribute('data-section', section.id);
-        card.onclick = () => handleSectionClick(section.id);
-        
-        card.innerHTML = `
-            <div class="absolute inset-0 bg-gradient-to-br ${section.color} opacity-0 group-hover:opacity-20 smooth-transition"></div>
-            <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${section.color} opacity-30 blur-2xl group-hover:opacity-50 smooth-transition"></div>
-            
-            <div class="relative p-6">
-                <div class="absolute top-4 right-4 px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r ${section.color} text-white badge-pulse">
-                    ${section.badge}
-                </div>
-                
-                <div class="w-16 h-16 rounded-2xl bg-gradient-to-br ${section.color} flex items-center justify-center mb-4 group-hover:scale-110 smooth-transition text-3xl hover-glow">
-                    ${section.icon}
-                </div>
-                
-                <h3 class="text-xl font-bold mb-2 text-white group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:bg-clip-text group-hover:from-pink-400 group-hover:to-cyan-400 smooth-transition">
-                    ${section.name}
-                </h3>
-                <p class="text-gray-400 text-sm">
-                    ${section.description}
-                </p>
-                
-                <div class="mt-4 flex items-center text-sm font-medium text-gray-500 group-hover:text-pink-400 smooth-transition">
-                    Ver más
-                    <span class="ml-2 group-hover:translate-x-1 smooth-transition">→</span>
-                </div>
-            </div>
-
-            <div class="shine absolute inset-0 opacity-0 group-hover:opacity-100 smooth-transition pointer-events-none">
-                <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full"></div>
-            </div>
-        `;
-        
-        container.appendChild(card);
+document.addEventListener('DOMContentLoaded', () => {
+    const root = document.getElementById('rows-root');
+    galleries.forEach(g => {
+        const row = createRowSkeleton(g);
+        root.appendChild(row);
+        loadRowData(g, row.querySelector('.netflix-row'));
     });
+});
+
+function createRowSkeleton(gallery) {
+    const wrapper = document.createElement('section');
+    wrapper.className = 'mb-12';
+    wrapper.innerHTML = `
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-2xl font-bold">${gallery.title}</h2>
+        </div>
+        <div class="anime-scroll-container">
+            <div class="netflix-row" data-endpoint="${gallery.endpoint}">
+                <div class="flex items-center justify-center w-full"><div class="loading-spinner"></div></div>
+            </div>
+        </div>
+    `;
+    return wrapper;
 }
 
-async function handleSectionClick(sectionId) {
-    const section = sections.find(s => s.id === sectionId);
-    
-    document.querySelectorAll('.card').forEach(card => {
-        card.classList.remove('active-card');
-    });
-    document.querySelector(`[data-section="${sectionId}"]`).classList.add('active-card');
-    
-    const display = document.getElementById('section-display');
-    display.classList.remove('hidden');
-    
-    const iconEl = document.getElementById('section-icon');
-    iconEl.className = `w-12 h-12 rounded-xl bg-gradient-to-br ${section.color} flex items-center justify-center text-2xl smooth-transition`;
-    iconEl.textContent = section.icon;
-    
-    document.getElementById('section-title').textContent = section.name;
-    document.getElementById('section-description').textContent = section.description;
-    
-    const contentEl = document.getElementById('section-content');
-    contentEl.innerHTML = '<div class="flex justify-center"><div class="loading-spinner"></div></div>';
-    
-    display.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    
+async function loadRowData(gallery, rowEl) {
     try {
-        const response = await fetch(section.endpoint);
-        if (!response.ok) throw new Error('Error en la petición');
+        // Obtener id_usuario de la URL si existe
+        const urlParams = new URLSearchParams(window.location.search);
+        const idUsuario = urlParams.get('id_usuario');
         
-        const data = await response.json();
-        displayContent(sectionId, data);
-    } catch (error) {
-        console.error('Error:', error);
-        contentEl.innerHTML = '<p class="text-red-400 text-center">⚠️ No se pudo cargar los datos</p>';
+        let endpoint = gallery.endpoint;
+        if (idUsuario && (gallery.endpoint.includes('recomendaciones') || gallery.endpoint.includes('joyas-ocultas') || gallery.endpoint.includes('mi-lista'))) {
+            endpoint += `?id_usuario=${idUsuario}`;
+        }
+        
+        const res = await fetch(endpoint);
+        if (!res.ok) throw new Error('Fetch error');
+        const data = await res.json();
+
+        let animes = [];
+        if (gallery.endpoint.includes('joyas-ocultas')) animes = data.hidden_gems || [];
+        else if (gallery.endpoint.includes('recomendaciones')) animes = data.recomendaciones || [];
+        else if (gallery.endpoint.includes('mi-lista')) animes = data.animes || [];
+
+        renderRow(rowEl, animes);
+    } catch (err) {
+        console.error('Error loading row', gallery, err);
+        rowEl.innerHTML = '<p class="text-red-400">Error al cargar</p>';
     }
 }
 
-function displayContent(sectionId, data) {
-    const contentEl = document.getElementById('section-content');
-    
-    switch(sectionId) {
-        case 'mi-lista':
-            displayAnimeList(data.animes || []);
-            break;
-        case 'proyectar':
-            displayAnimeList(data.trending || []);
-            break;
-        case 'pronostico':
-            displayAnimeList(data.high_rated || []);
-            break;
-        case 'mapa':
-            displayGenres(data.genres || []);
-            break;
-        case 'adn':
-            displayAnimeList(data.animes || []);
-            break;
-        case 'joyas':
-            displayAnimeList(data.hidden_gems || []);
-            break;
-        default:
-            contentEl.innerHTML = '<p class="text-center text-gray-400">Sin datos disponibles</p>';
-    }
-}
+function renderRow(rowEl, animes) {
+    rowEl.innerHTML = '';
+    const scrollWrap = document.createElement('div');
+    scrollWrap.className = 'anime-scroll-wrapper';
 
-function displayAnimeList(animes) {
-    const contentEl = document.getElementById('section-content');
-    
-    if (!animes || animes.length === 0) {
-        contentEl.innerHTML = `
-            <div class="empty-state">
-                <div class="empty-state-icon">📺</div>
-                <h3 class="text-xl font-bold mb-2">No hay animes disponibles</h3>
-                <p>Conecta tu archivo Parquet para ver los datos</p>
-            </div>
-        `;
-        return;
-    }
-    
-    const grid = document.createElement('div');
-    grid.className = 'anime-grid';
-    
     animes.forEach(anime => {
-        const card = document.createElement('div');
-        card.className = 'anime-card';
-        
-        const imageUrl = anime.image_url || anime.img_url || 'https://via.placeholder.com/200x250?text=No+Image';
-        const title = anime.title || anime.name || 'Sin título';
-        const score = anime.score || anime.rating || 'N/A';
-        const genres = anime.genres || anime.genre || '';
-        
-        card.innerHTML = `
-            <img src="${imageUrl}" alt="${title}" onerror="this.src='https://via.placeholder.com/200x250?text=No+Image'">
-            <div class="p-4">
-                <div class="anime-title">${title}</div>
-                <div class="flex items-center justify-between mb-3">
-                    <span class="anime-rating">⭐ ${score}</span>
-                    ${anime.episodes ? `<span class="text-gray-400 text-sm">${anime.episodes} eps</span>` : ''}
+        const card = createNetflixCard(anime);
+        scrollWrap.appendChild(card);
+    });
+
+    rowEl.appendChild(scrollWrap);
+}
+
+function createNetflixCard(anime) {
+    const card = document.createElement('div');
+    card.className = 'anime-card-horizontal';
+
+    const title = anime.titulo_anime || anime.nombre_anime || anime.name || 'Sin título';
+    const score = anime.puntuacion || anime.puntuacion_usuario || anime.rating || '';
+    const episodes = anime.total_episodios || anime.episodes || '';
+    const image = anime.image_url || anime.img_url || '/static/img/imagen_no_encontrada.png';
+    const preview = anime.preview_url || anime.trailer_url || null;
+    const animeId = anime.id_anime || '';
+
+    card.innerHTML = `
+        <div class="poster-wrap group">
+            <div class="anime-poster">
+                <img src="${image}" alt="${title}" loading="lazy" onerror="this.src='/static/img/imagen_no_encontrada.png'">
+                ${preview ? `<video class="preview-video" muted preload="none" src="${preview}"></video>` : ''}
+                <div class="overlay">
+                    <div class="overlay-top flex justify-between items-center">
+                        <span class="badge-rating">${score ? '⭐ '+score : ''}</span>
+                    </div>
+                    <div class="overlay-bottom">
+                        <h4 class="line-clamp-2">${title}</h4>
+                        <div class="mt-3 flex gap-2 flex-col">
+                            <button class="btn-predict" data-id="${animeId}" data-title="${title}">❓ ¿Me gustará?</button>
+                            <button class="btn-add" data-id="${animeId}">+ Mi lista</button>
+                        </div>
+                    </div>
                 </div>
-                ${genres ? `<div class="anime-genre">${genres.split(',')[0]}</div>` : ''}
+            </div>
+        </div>
+    `;
+
+    // Hover preview behavior
+    const video = card.querySelector('.preview-video');
+    if (video) {
+        card.addEventListener('mouseenter', () => {
+            try { video.currentTime = 0; video.play(); } catch(e){}
+        });
+        card.addEventListener('mouseleave', () => {
+            try { video.pause(); video.currentTime = 0; } catch(e){}
+        });
+    }
+
+    // Prediction behavior
+    const predictBtn = card.querySelector('.btn-predict');
+    predictBtn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        await showPrediction(animeId, title, predictBtn);
+    });
+
+    // Add to list behavior (localStorage)
+    const addBtn = card.querySelector('.btn-add');
+    addBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const list = JSON.parse(localStorage.getItem('mi_lista') || '[]');
+        const id = addBtn.getAttribute('data-id') || title;
+        if (!list.includes(id)) {
+            list.push(id);
+            localStorage.setItem('mi_lista', JSON.stringify(list));
+            addBtn.textContent = '✓ Guardado';
+            addBtn.classList.add('saved');
+        }
+    });
+
+    return card;
+}
+
+async function showPrediction(animeId, title, btnElement) {
+    try {
+        btnElement.disabled = true;
+        btnElement.textContent = '⏳ Analizando...';
+        
+        // Obtener id_usuario de la URL o usar por defecto
+        const urlParams = new URLSearchParams(window.location.search);
+        const idUsuario = urlParams.get('id_usuario') || null; // null hará que use el default del backend
+        
+        let url = `/api/predecir-anime/${animeId}`;
+        if (idUsuario) {
+            url += `?id_usuario=${idUsuario}`;
+        }
+        
+        console.log(`Prediciendo anime ${animeId} con usuario ${idUsuario || 'default'}...`);
+        
+        const res = await fetch(url);
+        if (!res.ok) throw new Error('Error en predicción');
+        const data = await res.json();
+        
+        // Crear modal con resultado
+        const modal = document.createElement('div');
+        modal.className = 'prediction-modal';
+        
+        // Calcular grados del círculo (360 * probabilidad)
+        const degrees = 360 * data.probabilidad;
+        
+        modal.innerHTML = `
+            <div class="prediction-content" style="--prob: ${degrees}deg">
+                <button class="close-modal">✕</button>
+                <h3 class="text-2xl font-bold mb-4">${data.titulo}</h3>
+                <div class="prediction-result">
+                    <div class="probability-circle">
+                        <span class="prob-text">${data.porcentaje}</span>
+                    </div>
+                    <div class="prediction-details">
+                        <p class="text-lg font-semibold mb-2">
+                            Predicción: <span class="prediction-value ${data.prediccion === 'Sí' ? 'yes' : 'no'}">
+                                ${data.prediccion === 'Sí' ? '✓ SÍ' : '✗ NO'}
+                            </span>
+                        </p>
+                        <p class="text-gray-300">${data.mensaje}</p>
+                    </div>
+                </div>
+                <button class="btn-close-modal mt-6">Cerrar</button>
             </div>
         `;
         
-        grid.appendChild(card);
-    });
-    
-    contentEl.innerHTML = '';
-    contentEl.appendChild(grid);
-}
-
-function displayGenres(genres) {
-    const contentEl = document.getElementById('section-content');
-    
-    if (!genres || genres.length === 0) {
-        contentEl.innerHTML = `
-            <div class="empty-state">
-                <div class="empty-state-icon">🗺️</div>
-                <h3 class="text-xl font-bold mb-2">No hay géneros disponibles</h3>
-            </div>
-        `;
-        return;
+        document.body.appendChild(modal);
+        
+        modal.querySelector('.close-modal').addEventListener('click', () => modal.remove());
+        modal.querySelector('.btn-close-modal').addEventListener('click', () => modal.remove());
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) modal.remove();
+        });
+        
+        btnElement.disabled = false;
+        btnElement.textContent = '❓ ¿Me gustará?';
+        
+    } catch (err) {
+        console.error('Error en predicción:', err);
+        btnElement.textContent = '❌ Error';
+        btnElement.disabled = false;
+        setTimeout(() => {
+            btnElement.textContent = '❓ ¿Me gustará?';
+        }, 2000);
     }
-    
-    const list = document.createElement('div');
-    list.className = 'genre-list';
-    
-    genres.forEach(genre => {
-        const item = document.createElement('div');
-        item.className = 'genre-item';
-        item.textContent = genre;
-        item.onclick = () => alert(`Próximamente: filtrar por ${genre}`);
-        list.appendChild(item);
-    });
-    
-    contentEl.innerHTML = '';
-    contentEl.appendChild(list);
 }
-
-document.addEventListener('DOMContentLoaded', generateCards);

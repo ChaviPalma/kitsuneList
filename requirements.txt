@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+pandas
+jinja2
+python-multipart
+scikit-learn>=1.5.1
+fastparquet>=0.4.0
+pyarrow>=5.0.0

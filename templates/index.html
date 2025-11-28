@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KinetsuList - Recomendaciones de Anime</title>
+    <title>KitsuneList - Recomendaciones de Anime</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/index.css">
 </head>
 <body class="bg-slate-950 text-white min-h-screen">
     <!-- Header -->
@@ -14,16 +14,22 @@
         
         <div class="relative max-w-7xl mx-auto px-8 py-12">
             <div class="flex items-center justify-center gap-4 mb-3">
+                <a href="/admin" class="absolute top-6 right-6 z-20 flex items-center gap-2 px-4 py-2 rounded-full bg-slate-900/50 border border-slate-700 text-slate-300 hover:bg-pink-600 hover:text-white hover:border-pink-500 hover:shadow-[0_0_15px_rgba(236,72,153,0.5)] transition-all duration-300 backdrop-blur-md group text-sm font-semibold">
+                    <span class="group-hover:rotate-90 transition-transform duration-500">⚙️</span>
+                    <span>Admin</span>
+                </a>
                 <div class="w-12 h-1 bg-gradient-to-r from-transparent via-pink-500 to-transparent"></div>
+                
                 <svg class="w-8 h-8 text-pink-500 fill-pink-500" viewBox="0 0 24 24">
                     <polygon points="5 3 19 12 5 21 5 3"></polygon>
                 </svg>
                 <div class="w-12 h-1 bg-gradient-to-r from-transparent via-pink-500 to-transparent"></div>
+                
             </div>
             
             <h1 class="text-6xl font-black text-center mb-2 tracking-tight fade-in">
                 <span class="bg-gradient-to-r from-pink-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
-                    Kinetsu
+                    Kitsune
                 </span>
                 <span class="text-white">List</span>
             </h1>
@@ -37,37 +43,23 @@
         </div>
     </div>
 
-    <!-- Navigation Cards -->
-    <div class="max-w-7xl mx-auto px-8 py-12">
-        <div id="cards-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
-    </div>
+    
 
-    <!-- Active Section Display -->
-    <div id="section-display" class="max-w-7xl mx-auto px-8 pb-12 hidden fade-in">
-        <div class="bg-slate-900 rounded-xl border-2 border-pink-500 p-8 shadow-pink">
-            <div class="flex items-center gap-4 mb-6">
-                <div id="section-icon" class="w-12 h-12 rounded-xl flex items-center justify-center smooth-transition"></div>
-                <div>
-                    <h3 id="section-title" class="text-2xl font-bold text-white"></h3>
-                    <p id="section-description" class="text-gray-400"></p>
-                </div>
-            </div>
-            
-            <div class="bg-slate-950 rounded-lg p-6 border border-slate-800 glass-effect">
-                <div id="section-content" class="text-gray-300"></div>
-            </div>
-        </div>
+    <!-- Netflix-style Rows -->
+    <div class="max-w-7xl mx-auto px-8 py-12">
+        <!-- Rows will be injected here by app.js -->
+        <div id="rows-root"></div>
     </div>
 
     <!-- Footer -->
     <div class="border-t border-slate-800 mt-12">
         <div class="max-w-7xl mx-auto px-8 py-8 text-center">
             <p class="text-gray-500 text-sm">
-                © 2024 KinetsuList - Tu guía definitiva del anime
+                © 2024 KitsuneList - Tu guía definitiva del anime
             </p>
         </div>
     </div>
 
-    <script src="/static/js/app.js"></script>
+    <script src="/static/js/app.js?v={{ app_version }}"></script>
 </body>
 </html>
